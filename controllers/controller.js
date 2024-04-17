@@ -1,7 +1,7 @@
 const { getTopics } = require('../models/model');
 const endpointsData = require('../endpoints.json');
 
-function retreiveTopics(req, res, next) {
+function retrieveTopics(req, res, next) {
     getTopics()
     .then((result) => {
         res.status(200).send({topics: result});
@@ -10,4 +10,4 @@ function retreiveTopics(req, res, next) {
     })
 }
 
-module.exports = { retreiveTopics };
+module.exports = { retrieveTopics };
