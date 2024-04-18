@@ -89,7 +89,6 @@ describe('/api/articles/:id', () => {
             })
         })
     })
-})
 
 describe('/api', () => {
     test('200: GET /api - responds with ', () => {
