@@ -15,7 +15,6 @@ function getArticle(id) {
 }
 
 function getArticlesSorted() {
-    // console.log('In model');
     return db.query(`SELECT *, (SELECT COUNT(*) FROM comments WHERE comments.article_id = articles.article_id) AS comment_count FROM articles ORDER BY created_at DESC`)
     .then((sortedArticle) => {
         return sortedArticle.rows.length === 0 ?  Promise.reject({ status: 404, message: '404: Not found'}) : sortedArticle.rows;

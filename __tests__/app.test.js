@@ -115,4 +115,23 @@ describe('/api/articles', () => {
             })
         })
     })
+
+    test('200: GET /api/articles - array returned should be sorted by date in descending order', () => {
+        return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({ body }) => {
+            const {articles} = body;
+            const dates = [];
+            expect(articles.length > 0).toBe(true);
+
+            articles.forEach((article) =>{
+                dates.push(article.created_at);
+            })
+
+            expect(articles).toBeSortedBy('created_at', {
+                descending: true,
+            })
+        })
+    })
 })
