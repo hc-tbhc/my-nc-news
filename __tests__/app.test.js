@@ -44,16 +44,6 @@ describe('/api/topics', () => {
     })
 })
 
-describe('/api', () => {
-    test('200: GET /api - responds with ', () => {
-        return request(app)
-        .get('/api')
-        .expect(200)
-        .then(({ body }) => {
-            expect(body).toEqual(endpointsData);
-        })
-    })
-})
 
 describe('/api/articles/:id', () => {
     describe('STATUS 200', () => {
@@ -91,7 +81,7 @@ describe('/api/articles/:id', () => {
     })
 
 describe('/api', () => {
-    test('200: GET /api - responds with ', () => {
+    test('200: GET /api - responds with an object of the API\'s endpoints', () => {
         return request(app)
         .get('/api')
         .expect(200)
@@ -101,4 +91,28 @@ describe('/api', () => {
     })
 })
 
+describe('/api/articles', () => {
+    test('200: GET /api/articles - responds with an array of article objects containing the relevant keys', () => {
+        return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({ body }) => {
+            const {articles} = body;
+            expect(articles.length > 0).toBe(true);
 
+            articles.forEach((article) =>{
+                expect(article).toMatchObject({
+                    author: expect.any(String),
+                    title: expect.any(String),
+                    article_id: expect.any(Number),
+                    topic: expect.any(String),
+                    created_at: expect.any(String),
+                    votes: expect.any(Number),
+                    article_img_url: expect.any(String),
+                    comment_count: expect.any(String),
+                    
+                })
+            })
+        })
+    })
+})
