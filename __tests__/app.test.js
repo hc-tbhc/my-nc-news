@@ -2,6 +2,7 @@ const app = require('../app');
 const db = require('../db/connection');
 const seed = require('../db/seeds/seed');
 const data = require('../db/data/test-data/index');
+const endpointsData = require('../endpoints.json');
 const request = require('supertest');
 
 beforeEach(() => {
@@ -39,6 +40,17 @@ describe('/api/topics', () => {
             .then(({body}) => {
                 expect(body.message).toBe('404: Not found');
             })
+        })
+    })
+})
+
+describe('/api', () => {
+    test('200: GET /api - responds with ', () => {
+        return request(app)
+        .get('/api')
+        .expect(200)
+        .then(({ body }) => {
+            expect(body).toEqual(endpointsData);
         })
     })
 })

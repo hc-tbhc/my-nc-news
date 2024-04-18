@@ -8,8 +8,6 @@ function getTopics() {
 }
 
 function getArticle(id) {
-    const notFoundMsg = { status: 404, message: '404: Not found'};
-    const badReqMsg = { status: 400, message: '400: Bad request'};
     return db.query(`SELECT * FROM articles WHERE article_id = $1`, [id])
     .then((article) => {
         return article.rows.length === 0 ?  Promise.reject({ status: 404, message: '404: Not found'}) : article.rows[0];
