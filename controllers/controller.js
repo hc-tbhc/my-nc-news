@@ -8,7 +8,7 @@ function retreiveTopics(req, res, next) {
         res.status(200).send({topics: result});
     }).catch((error) => {
         next(error);
-    })
+    });
 }
 
 function retrieveArticleById(req, res, next) {
