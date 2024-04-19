@@ -1,4 +1,4 @@
-const { getTopics, getArticle, getArticlesSorted, getCommentByArticle } = require('../models/model');
+const { getTopics, getArticle, getArticlesSorted, getCommentByArticle, postCommentById } = require('../models/model');
 const endpointsData = require('../endpoints.json');
 const articlesData = require('../db/data/test-data/articles');
 
@@ -32,7 +32,6 @@ function retrieveArticles(req, res, next) {
 
 function retrieveCommentById(req, res, next) {
     const {id} = req.params;
-    // console.log(req.query);
     getCommentByArticle(id)
     .then((comments) => {
         res.status(200).send(comments);
@@ -41,4 +40,15 @@ function retrieveCommentById(req, res, next) {
     })
 }
 
-module.exports = { retrieveTopics, retrieveArticleById, retrieveArticles, retrieveCommentById };
+function postComment(req, res, next) {
+    const {id} = req.params
+    const body = req.body;
+    postCommentById(id, body)
+    .then((comment) => {
+        res.status(201).send({ comment })
+    }).catch((error) => {
+        next(error);
+    })
+}
+
+module.exports = { retrieveTopics, retrieveArticleById, retrieveArticles, retrieveCommentById, postComment };
