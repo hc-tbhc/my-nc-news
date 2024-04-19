@@ -15,10 +15,17 @@ function getArticle(id) {
 }
 
 function getArticlesSorted() {
-    return db.query(`SELECT *, (SELECT COUNT(*) FROM comments WHERE comments.article_id = articles.article_id) AS comment_count FROM articles ORDER BY created_at DESC`)
+    return db.query(`SELECT author, title, article_id, topic, created_at, votes, article_img_url, (SELECT COUNT(*) FROM comments WHERE comments.article_id = articles.article_id) AS comment_count FROM articles ORDER BY created_at DESC`)
     .then((sortedArticle) => {
         return sortedArticle.rows.length === 0 ?  Promise.reject({ status: 404, message: '404: Not found'}) : sortedArticle.rows;
     });
 }
 
-module.exports = { getTopics, getArticle, getArticlesSorted };
+function getCommentByArticle(id) {
+    return db.query(`SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC`, [id])
+    .then((comment) => {
+        return comment.rows.length === 0 ?  Promise.reject({ status: 404, message: '404: Not found'}) : comment.rows;
+    });
+}
+
+module.exports = { getTopics, getArticle, getArticlesSorted, getCommentByArticle };

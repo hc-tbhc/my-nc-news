@@ -1,4 +1,4 @@
-const { getTopics, getArticle, getArticlesSorted } = require('../models/model');
+const { getTopics, getArticle, getArticlesSorted, getCommentByArticle } = require('../models/model');
 const endpointsData = require('../endpoints.json');
 const articlesData = require('../db/data/test-data/articles');
 
@@ -23,15 +23,22 @@ function retrieveArticleById(req, res, next) {
 
 function retrieveArticles(req, res, next) {
     getArticlesSorted()
-    .then((result) => {
-        const articlesToSend = result.map((article) => {
-            delete article.body;
-            return article;
-        })
-        res.status(200).send({ articles: articlesToSend });
+    .then((sortedArticles) => {
+        res.status(200).send(sortedArticles);
     }).catch((error) => {
         next(error);
     });
 }
 
-module.exports = { retrieveTopics, retrieveArticleById, retrieveArticles };
+function retrieveCommentById(req, res, next) {
+    const {id} = req.params;
+    // console.log(req.query);
+    getCommentByArticle(id)
+    .then((comments) => {
+        res.status(200).send(comments);
+    }).catch((error) => {
+        next(error);
+    })
+}
+
+module.exports = { retrieveTopics, retrieveArticleById, retrieveArticles, retrieveCommentById };
