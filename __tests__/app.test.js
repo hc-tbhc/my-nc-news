@@ -168,3 +168,59 @@ describe('/api/articles/:id/comments', () => {
         })
     })
 })
+
+describe('/api/articles/:id/comments', () => {
+    describe('STATUS 201', () => {
+        test('201: POST /api/articles/:id/comments - posts comment to chosen article and responds with the posted comment', () => {
+            const testComment = {
+                username: 'butter_bridge',
+                body: 'This is a comment'
+            }
+
+            return request(app)
+            .post('/api/articles/3/comments')
+            .send(testComment)
+            .expect(201)
+            .then(({ body }) => {
+                const { comment } = body;
+
+                const expectedComment = {
+                    body: 'This is a comment',
+                    votes: 0,
+                    author: 'butter_bridge',
+                    article_id: 3,
+                }
+                
+                expect(comment).toMatchObject(expectedComment);
+            })
+        })
+    })
+
+    describe('STATUS 400', () => {
+        test('400: POST /api/articles/:id/comments - attempting to post a comment without the required fields will return an appropriate error', () => {
+            return request(app)
+            .post('/api/articles/3/comments')
+            .send()
+            .expect(400)
+            .then(({ body }) => {                
+                expect(body.message).toBe('400: Missing required fields');
+            })
+        })
+
+        test('400: POST /api/articles/:id/comments - attempting to post an incorrectly formatted comment will return an appropriate error', () => {
+            const testComment = {
+                username: 3,
+                body: 'This is a comment'
+            }
+            
+            return request(app)
+            .post('/api/articles/3/comments')
+            .send(testComment)
+            .expect(400)
+            .then(({ body }) => {                
+                expect(body.message).toBe('400: Failing schema validation');
+            })
+        })
+    })
+})
+

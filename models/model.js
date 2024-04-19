@@ -28,4 +28,21 @@ function getCommentByArticle(id) {
     });
 }
 
-module.exports = { getTopics, getArticle, getArticlesSorted, getCommentByArticle };
+function postCommentById(id, body) {
+    const votes = body.votes || 0;
+
+    if (!body.username || !body.body) {
+        return Promise.reject({status: 400, message: '400: Missing required fields'})
+    }
+
+    if (typeof body.username !== 'string' || typeof body.body !== 'string') {
+        return Promise.reject({status: 400, message: '400: Failing schema validation'})
+    }
+
+    return db.query(`INSERT INTO comments (body, votes, author, article_id) VALUES ($1, $2, $3, $4) RETURNING *`, [body.body, votes, body.username, id])
+    .then((comment) => {
+        return comment.rows[0];
+    })
+}
+
+module.exports = { getTopics, getArticle, getArticlesSorted, getCommentByArticle, postCommentById };
