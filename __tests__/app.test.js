@@ -383,3 +383,33 @@ describe('/api/articles/:id', () => {
         })
     })
 })
+
+describe('/api/comments/:id', () => {
+    describe('STATUS 204', () => {
+        test('204: DELETE /api/comments/:id - deletes the comment with the given id and responds with no content', () => {
+            return request(app)
+            .delete('/api/comments/1')
+            .expect(204)
+        })
+    })
+
+    describe('ERRORS', () => {
+        test('404 returns \'404: Not found\' for route that does not exist', () => {
+            return request(app)
+            .delete('/api/j/1')
+            .expect(404)
+            .then(({body}) => {
+                expect(body.message).toBe('404: Not found');
+            })
+        })
+
+        test('404: GET /api/articles/:id - responds with \'404: Not found\' when passed an id that does not exist', () => {
+            return request(app)
+            .get('/api/comments/9999')
+            .expect(404)
+            .then(({body}) => {
+                expect(body.message).toBe('404: Not found');
+            })
+        })
+    })
+})

@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const { retrieveTopics, retrieveArticleById, retrieveArticles, retrieveCommentById, postComment, patchVotes } = require('./controllers/controller');
+const { retrieveTopics, retrieveArticleById, retrieveArticles, retrieveCommentById, postComment, patchVotes, deleteComment } = require('./controllers/controller');
 const endpointsData = require('./endpoints.json');
 
 app.use(express.json())
@@ -20,6 +20,8 @@ app.get('/api/articles/:id/comments', retrieveCommentById);
 app.post('/api/articles/:id/comments', postComment);
 
 app.patch('/api/articles/:id', patchVotes);
+
+app.delete('/api/comments/:id', deleteComment)
 
 app.use('*', (req, res, next) => {
     res.status(404).send({status: 404, message: '404: Not found'});

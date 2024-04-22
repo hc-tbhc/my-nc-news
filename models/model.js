@@ -63,4 +63,8 @@ function PatchVotesById(id, body) {
     })
 }
 
-module.exports = { getTopics, getArticle, getArticlesSorted, getCommentByArticle, postCommentById, PatchVotesById };
+function deleteCommentByOwnId(id) {
+    return db.query(`DELETE FROM comments WHERE comment_id = $1`, [id])
+}
+
+module.exports = { getTopics, getArticle, getArticlesSorted, getCommentByArticle, postCommentById, PatchVotesById, deleteCommentByOwnId };
