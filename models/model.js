@@ -8,6 +8,10 @@ function getTopics() {
 }
 
 function getArticle(id) {
+    // if (/^\d+$/.test(id) === false) {
+    //     return Promise.reject({ status: 404, message: '400: Bad request'})
+    // }
+
     return db.query(`SELECT * FROM articles WHERE article_id = $1`, [id])
     .then((article) => {
         return article.rows.length === 0 ?  Promise.reject({ status: 404, message: '404: Not found'}) : article.rows[0];
@@ -45,4 +49,18 @@ function postCommentById(id, body) {
     })
 }
 
-module.exports = { getTopics, getArticle, getArticlesSorted, getCommentByArticle, postCommentById };
+function PatchVotesById(id, body) {
+    if (!body.inc_votes) {
+        return Promise.reject({status: 400, message: '400: Missing required fields'})
+    }
+
+    if (typeof body.inc_votes !== 'number') {
+        return Promise.reject({status: 400, message: '400: Failing schema validation'})
+    }
+    return db.query(`UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *`, [body.inc_votes, id])
+    .then((article) => {
+        return article.rows.length === 0 ?  Promise.reject({ status: 404, message: '404: Not found'}) : article.rows[0];
+    })
+}
+
+module.exports = { getTopics, getArticle, getArticlesSorted, getCommentByArticle, postCommentById, PatchVotesById };
