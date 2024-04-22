@@ -8,10 +8,6 @@ function getTopics() {
 }
 
 function getArticle(id) {
-    // if (/^\d+$/.test(id) === false) {
-    //     return Promise.reject({ status: 404, message: '400: Bad request'})
-    // }
-
     return db.query(`SELECT * FROM articles WHERE article_id = $1`, [id])
     .then((article) => {
         return article.rows.length === 0 ?  Promise.reject({ status: 404, message: '404: Not found'}) : article.rows[0];
@@ -67,4 +63,10 @@ function deleteCommentByOwnId(id) {
     return db.query(`DELETE FROM comments WHERE comment_id = $1`, [id])
 }
 
-module.exports = { getTopics, getArticle, getArticlesSorted, getCommentByArticle, postCommentById, PatchVotesById, deleteCommentByOwnId };
+function getUsers() {
+    return db.query('SELECT * FROM users').then((user) => {
+        return user.rows;
+    });
+}
+
+module.exports = { getTopics, getArticle, getArticlesSorted, getCommentByArticle, postCommentById, PatchVotesById, deleteCommentByOwnId, getUsers };
