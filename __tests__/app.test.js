@@ -32,7 +32,7 @@ describe('/api/topics', () => {
         })
     })
     describe('ERRORS', () => {
-        test('404 returns \'path not found\' for route that does not exist', () => {
+        test('404: GET /api/topics - responds with \'404: Not found\' for route that does not exist', () => {
             return request(app)
             .get('/api/h')
             .expect(404)
@@ -68,6 +68,15 @@ describe('/api/articles/:id', () => {
     })
 
     describe('ERRORS', () => {
+        test('400: GET /api/articles/:id - responds with \'400: Bad request\' when passed \':id\' is passed an invalid argument', () => {
+            return request(app)
+            .get('/api/articles/string')
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.message).toBe('400: Bad request');
+            })
+        })
+
         test('404: GET /api/articles/:id - responds with \'404: Not found\' when passed an id that does not exist', () => {
             return request(app)
             .get('/api/articles/16')
@@ -76,50 +85,92 @@ describe('/api/articles/:id', () => {
                 expect(body.message).toBe('404: Not found');
             })
         })
-    })
-})
 
-describe('/api', () => {
-    test('200: GET /api - responds with an object of the API\'s endpoints', () => {
-        return request(app)
-        .get('/api')
-        .expect(200)
-        .then(({ body }) => {
-            expect(body).toEqual(endpointsData);
+        test('404: GET /api/articles/:id - responds with \'404: Not found\' for route that does not exist', () => {
+            return request(app)
+            .get('/api/string/16')
+            .expect(404)
+            .then(({body}) => {
+
+                expect(body.message).toBe('404: Not found');
+            })
         })
     })
 })
 
-describe('/api/articles', () => {
-    test('200: GET /api/articles - responds with an array of article objects containing the relevant keys', () => {
-        return request(app)
-        .get('/api/articles')
-        .expect(200)
-        .then(({ body }) => {
-            expect()
+describe('/api', () => {
+    describe('STATUS 200', () => {
+        test('200: GET /api - responds with an object of the API\'s endpoints', () => {
+            return request(app)
+            .get('/api')
+            .expect(200)
+            .then(({ body }) => {
+                const { endpoints } = body;
+    
+                expect(endpoints).toEqual(endpointsData);
+            })
+        })
+    })
 
-            body.forEach((article) =>{
-                expect(article).toMatchObject({
-                    author: expect.any(String),
-                    title: expect.any(String),
-                    article_id: expect.any(Number),
-                    topic: expect.any(String),
-                    created_at: expect.any(String),
-                    votes: expect.any(Number),
-                    article_img_url: expect.any(String),
-                    comment_count: expect.any(String),
+    describe('ERRORS', () => {
+            test('404: GET /api - responds with \'404: Not found\' for route that does not exist', () => {
+                return request(app)
+                .get('/ap')
+                .expect(404)
+                .then(({body}) => {
+        
+                    expect(body.message).toBe('404: Not found');
+                })
+            })
+    })
+})
+
+describe('/api/articles', () => {
+    describe('STATUS 200', () => {
+        test('200: GET /api/articles - responds with an array of article objects containing the relevant keys', () => {
+            return request(app)
+            .get('/api/articles')
+            .expect(200)
+            .then(({ body }) => {
+                const { sortedArticles } = body;
+
+                sortedArticles.forEach((article) =>{
+                    expect(article).toMatchObject({
+                        author: expect.any(String),
+                        title: expect.any(String),
+                        article_id: expect.any(Number),
+                        topic: expect.any(String),
+                        created_at: expect.any(String),
+                        votes: expect.any(Number),
+                        article_img_url: expect.any(String),
+                        comment_count: expect.any(String),
+                    })
+                })
+            })
+        })
+
+        test('200: GET /api/articles - array returned should be sorted by date in descending order', () => {
+            return request(app)
+            .get('/api/articles')
+            .expect(200)
+            .then(({ body }) => {
+                const { sortedArticles } = body;
+                
+                expect(sortedArticles).toBeSortedBy('created_at', {
+                    descending: true,
                 })
             })
         })
     })
 
-    test('200: GET /api/articles - array returned should be sorted by date in descending order', () => {
-        return request(app)
-        .get('/api/articles')
-        .expect(200)
-        .then(({ body }) => {
-            expect(body).toBeSortedBy('created_at', {
-                descending: true,
+    describe('ERRORS', () => {
+        test('404 returns \'404: Not found\' for route that does not exist', () => {
+            return request(app)
+            .get('/api/j')
+            .expect(404)
+            .then(({body}) => {
+    
+                expect(body.message).toBe('404: Not found');
             })
         })
     })
@@ -132,14 +183,16 @@ describe('/api/articles/:id/comments', () => {
             .get('/api/articles/1/comments')
             .expect(200)
             .then(({ body }) => {
-                body.forEach((comment) => {
+                const { comments } = body;
+
+                comments.forEach((comment) => {
                     expect(comment).toMatchObject({
                         comment_id: expect.any(Number),
                         votes: expect.any(Number),
                         created_at: expect.any(String),
                         author: expect.any(String),
                         body: expect.any(String),
-                        article_id: expect.any(Number)
+                        article_id: 1
                     })
                 })
             })
@@ -150,7 +203,9 @@ describe('/api/articles/:id/comments', () => {
             .get('/api/articles/1/comments')
             .expect(200)
             .then(({ body }) => {
-                expect(body).toBeSortedBy('created_at', {
+                const { comments } = body;
+
+                expect(comments).toBeSortedBy('created_at', {
                     descending: true,
                 })
             })
@@ -166,6 +221,26 @@ describe('/api/articles/:id/comments', () => {
                 expect(body.message).toBe('404: Not found');
             })
         })
+        
+        test('404: GET /api/articles/:id/comments - responds with \'404: Not found\' for route that does not exist', () => {
+            return request(app)
+            .get('/api/articles/1/j')
+            .expect(404)
+            .then(({body}) => {
+                
+                expect(body.message).toBe('404: Not found');
+            })
+        })
+
+        test('400: GET /api/articles/:id/comments  - responds with \'400: Bad request\' when \':id\' is passed an invalid argument', () => {
+            return request(app)
+            .get('/api/articles/string/comments')
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.message).toBe('400: Bad request');
+            })
+        }) 
+        
     })
 })
 
@@ -221,6 +296,90 @@ describe('/api/articles/:id/comments', () => {
                 expect(body.message).toBe('400: Failing schema validation');
             })
         })
+
+        test('404 returns \'404: Not found\' for route that does not exist', () => {
+            return request(app)
+            .get('/api/articles/3/j')
+            .expect(404)
+            .then(({body}) => {
+    
+                expect(body.message).toBe('404: Not found');
+            })
+        })
     })
 })
 
+describe('/api/articles/:id', () => {
+    describe('200: PATCH /api/articles/:id - ', () => {
+        test('200: GET /api/articles - responds with an array of article objects containing the relevant keys', () => {
+            const addToVotes = {
+                inc_votes: 4
+            };
+
+            return request(app)
+            .patch('/api/articles/1')
+            .send(addToVotes)
+            .expect(200)
+            .then(({ body }) => {
+                const { article } = body;
+
+                expect(article).toMatchObject({
+                    author: expect.any(String),
+                    title: expect.any(String),
+                    article_id: 1,
+                    topic: expect.any(String),
+                    created_at: expect.any(String),
+                    votes: 104,
+                    article_img_url: expect.any(String),
+                })
+            })
+        })
+    })
+
+    describe('ERRORS', () => {
+        test('400: POST /api/articles/:id/comments - attempting to post a comment without the required fields will return an appropriate error', () => {
+            return request(app)
+            .patch('/api/articles/1')
+            .send({})
+            .expect(400)
+            .then(({ body }) => {                
+                expect(body.message).toBe('400: Missing required fields');
+            })
+        })
+
+        test('400: POST /api/articles/:id/comments - attempting to post an incorrectly formatted comment will return an appropriate error', () => {
+            const addToVotes = {
+                inc_votes: 'four'
+            };
+            
+            return request(app)
+            .patch('/api/articles/1')
+            .send(addToVotes)
+            .expect(400)
+            .then(({ body }) => {                
+                expect(body.message).toBe('400: Failing schema validation');
+            })
+        })
+
+        test('404 returns \'404: Not found\' for route that does not exist', () => {
+            return request(app)
+            .patch('/api/j/1/')
+            .send({})
+            .expect(404)
+            .then(({body}) => {
+    
+                expect(body.message).toBe('404: Not found');
+            })
+        })
+
+        test('404: GET /api/articles/:id - responds with \'404: Not found\' for route that does not exist', () => {
+            return request(app)
+            .get('/api/articles/9999')
+            .expect(404)
+            .then(({body}) => {
+
+                expect(body.message).toBe('404: Not found');
+            })
+        })
+    })
+})
