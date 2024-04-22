@@ -1,4 +1,4 @@
-const { getTopics, getArticle, getArticlesSorted, getCommentByArticle, postCommentById, PatchVotesById } = require('../models/model');
+const { getTopics, getArticle, getArticlesSorted, getCommentByArticle, postCommentById, PatchVotesById, deleteCommentByOwnId } = require('../models/model');
 const endpointsData = require('../endpoints.json');
 const articlesData = require('../db/data/test-data/articles');
 
@@ -62,4 +62,14 @@ function patchVotes(req, res, next) {
     })  
 }
 
-module.exports = { retrieveTopics, retrieveArticleById, retrieveArticles, retrieveCommentById, postComment, patchVotes };
+function deleteComment(req, res, next) {
+    const {id} = req.params;
+    deleteCommentByOwnId(id)
+    .then(() => {
+        res.status(204).send();
+    }).catch((error) => {
+        next(error);
+    })
+}
+
+module.exports = { retrieveTopics, retrieveArticleById, retrieveArticles, retrieveCommentById, postComment, patchVotes, deleteComment };
