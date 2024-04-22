@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const { retrieveTopics, retrieveArticleById, retrieveArticles, retrieveCommentById, postComment, patchVotes, deleteComment } = require('./controllers/controller');
+const { retrieveTopics, retrieveArticleById, retrieveArticles, retrieveCommentById, postComment, patchVotes, deleteComment, retrieveUsers } = require('./controllers/controller');
 const endpointsData = require('./endpoints.json');
 
 app.use(express.json())
@@ -16,6 +16,8 @@ app.get('/api', (req, res) => {
 app.get('/api/articles', retrieveArticles);
 
 app.get('/api/articles/:id/comments', retrieveCommentById);
+
+app.get('/api/users', retrieveUsers);
 
 app.post('/api/articles/:id/comments', postComment);
 

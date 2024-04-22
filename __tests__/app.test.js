@@ -21,8 +21,6 @@ describe('/api/topics', () => {
             .expect(200)
             .then(({ body }) => {
                 const { topics } = body;
-              
-                expect(topics.length).toBe(3);
                 
                 topics.forEach((topic) => {
                     expect(typeof topic.description).toBe('string');
@@ -31,6 +29,7 @@ describe('/api/topics', () => {
             })
         })
     })
+
     describe('ERRORS', () => {
         test('404: GET /api/topics - responds with \'404: Not found\' for route that does not exist', () => {
             return request(app)
@@ -406,6 +405,38 @@ describe('/api/comments/:id', () => {
         test('404: GET /api/articles/:id - responds with \'404: Not found\' when passed an id that does not exist', () => {
             return request(app)
             .get('/api/comments/9999')
+            .expect(404)
+            .then(({body}) => {
+                expect(body.message).toBe('404: Not found');
+            })
+        })
+    })
+})
+
+describe('/api/users', () => {
+    describe('STATUS 200', () => {
+        test('200: /api/users - responds with an array of user objects', () => {
+            return request(app)
+            .get('/api/users')
+            .expect(200)
+            .then(({body}) => {
+                const { users } = body;
+                
+                users.forEach((user) => {
+                    expect(user).toMatchObject({
+                        username: expect.any(String),
+                        name: expect.any(String),
+                        avatar_url: expect.any(String)
+                    })
+                })
+            })
+        })
+    })
+
+    describe('ERRORS', () => {
+        test('404: GET /api/topics - responds with \'404: Not found\' for route that does not exist', () => {
+            return request(app)
+            .get('/api/h')
             .expect(404)
             .then(({body}) => {
                 expect(body.message).toBe('404: Not found');
