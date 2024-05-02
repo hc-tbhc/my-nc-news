@@ -22,7 +22,8 @@ function retrieveArticleById(req, res, next) {
 }
 
 function retrieveArticles(req, res, next) {
-    getArticlesSorted()
+    const {topic} = req.query;
+    getArticlesSorted(topic)
     .then((sortedArticles) => {
         res.status(200).send({ sortedArticles });
     }).catch((error) => {
