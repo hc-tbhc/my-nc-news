@@ -8,13 +8,22 @@ function getTopics() {
 }
 
 function getArticle(id) {
-    return db.query(`SELECT * FROM articles WHERE article_id = $1`, [id])
+    return db.query(`SELECT articles.*, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id WHERE articles.article_id = $1 GROUP BY articles.article_id`, [id])
     .then((article) => {
         return article.rows.length === 0 ?  Promise.reject({ status: 404, message: '404: Not found'}) : article.rows[0];
     });
 }
 
-function getArticlesSorted() {
+function getArticlesSorted(topic) {
+    if (topic) {
+        return db.query(
+        `SELECT * FROM articles 
+        WHERE topic = $1`, 
+        [topic]).then((article) => {
+            return article.rows.length === 0 ?  Promise.reject({ status: 404, message: '404: Not found'}) : article.rows
+        });
+    }
+
     return db.query(`SELECT author, title, article_id, topic, created_at, votes, article_img_url, (SELECT COUNT(*) FROM comments WHERE comments.article_id = articles.article_id) AS comment_count FROM articles ORDER BY created_at DESC`)
     .then((sortedArticle) => {
         return sortedArticle.rows.length === 0 ?  Promise.reject({ status: 404, message: '404: Not found'}) : sortedArticle.rows;
@@ -53,6 +62,7 @@ function PatchVotesById(id, body) {
     if (typeof body.inc_votes !== 'number') {
         return Promise.reject({status: 400, message: '400: Failing schema validation'})
     }
+
     return db.query(`UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *`, [body.inc_votes, id])
     .then((article) => {
         return article.rows.length === 0 ?  Promise.reject({ status: 404, message: '404: Not found'}) : article.rows[0];

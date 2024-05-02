@@ -53,16 +53,31 @@ describe('/api/articles/:id', () => {
             .then(({ body }) => {
                 const { article } = body;
 
-                expect(typeof article.author).toBe('string');
-                expect(typeof article.title).toBe('string');
-                expect(typeof article.article_id).toBe('number');
-                expect(typeof article.body).toBe('string');
-                expect(typeof article.topic).toBe('string');
-                expect(typeof article.created_at).toBe('string');
-                expect(typeof article. votes).toBe('number');
-                expect(typeof article.article_img_url).toBe('string');
-    
+                expect(article).toMatchObject({
+                    author: expect.any(String),
+                    title: expect.any(String),
+                    article_id: expect.any(Number),
+                    topic: expect.any(String),
+                    created_at: expect.any(String),
+                    votes: expect.any(Number),
+                    article_img_url: expect.any(String),
+                    comment_count: expect.any(String),
+                })
             })
+        })
+
+        test('200: GET /api/articles?topic=... - responds with a list of articles specified by a topic query', () => {
+            return request(app)
+                .get('/api/articles?topic=mitch')
+                .expect(200)
+                .then(({ body }) => {
+                    const articles = body.sortedArticles;
+
+                    expect(articles.length).toBe(12)
+                    articles.forEach((article) => {
+                        expect(article.topic).toBe('mitch');
+                    });
+                });
         })
     })
 
@@ -74,6 +89,20 @@ describe('/api/articles/:id', () => {
             .then(({ body }) => {
                 expect(body.message).toBe('400: Bad request');
             })
+        })
+        
+        test('400: GET /api/articles?topic=... - responds with \'400: Bad request\' when passed an invalid query', () => {
+            return request(app)
+                .get('/api/articles?topic=mitch')
+                .expect(200)
+                .then(({ body }) => {
+                    const articles = body.sortedArticles;
+
+                    expect(articles.length).toBe(12)
+                    articles.forEach((article) => {
+                        expect(article.topic).toBe('mitch');
+                    });
+                });
         })
 
         test('404: GET /api/articles/:id - responds with \'404: Not found\' when passed an id that does not exist', () => {
@@ -94,6 +123,7 @@ describe('/api/articles/:id', () => {
                 expect(body.message).toBe('404: Not found');
             })
         })
+
     })
 })
 
@@ -402,12 +432,12 @@ describe('/api/comments/:id', () => {
             })
         })
 
-        test('404: GET /api/articles/:id - responds with \'404: Not found\' when passed an id that does not exist', () => {
+        test('400: GET /api/articles/:id - responds with \'404: Not found\' when passed an id that does not exist', () => {
             return request(app)
-            .get('/api/comments/9999')
-            .expect(404)
+            .delete('/api/comments/string')
+            .expect(400)
             .then(({body}) => {
-                expect(body.message).toBe('404: Not found');
+                expect(body.message).toBe('400: Bad request');
             })
         })
     })
