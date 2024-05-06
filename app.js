@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 const { retrieveTopics, retrieveArticleById, retrieveArticles, retrieveCommentById, postComment, patchVotes, deleteComment, retrieveUsers } = require('./controllers/controller');
 const endpointsData = require('./endpoints.json');
+const cors = require('cors');
+
+app.use(cors());
 
 app.use(express.json())
 
