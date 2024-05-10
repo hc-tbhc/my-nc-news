@@ -1,5 +1,5 @@
 const { Pool } = require('pg');
-const ENV = process.env.NODE_ENV || 'test';
+const ENV = process.env.NODE_ENV || 'development';
 const config = {};
 
 require('dotenv').config({
